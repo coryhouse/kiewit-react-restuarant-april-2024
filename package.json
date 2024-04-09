@@ -1,5 +1,5 @@
 {
-  "name": "kiewit-react-restuarant-april-2024",
+  "name": "kiewit-react-restaurant-april-2024",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "jotai": "^2.8.0",
+    "json-server": "^0.17.3",
+    "ky": "^1.2.3",
+    "msw": "^2.2.13",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3",
+    "valtio": "^1.13.2",
+    "zod": "^3.22.4",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

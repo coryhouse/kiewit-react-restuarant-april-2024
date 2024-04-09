@@ -1,19 +1,35 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Food, foodSchema } from "./types";
-import { Spinner } from "./Spinner";
+import { Food, foodSchema } from "../types";
+import { Spinner } from "../Spinner";
 import ky from "ky";
 import { z } from "zod";
+
+type MenuSearch = {
+  foodSearch?: string;
+};
+
+export const Route = createFileRoute("/menu")({
+  component: Menu,
+  validateSearch: (search: Record<string, unknown>): MenuSearch => {
+    return {
+      foodSearch: z.string().optional().parse(search.foodSearch),
+    };
+  },
+});
 
 function Menu() {
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
-  const [search, setSearch] = useState("");
+
+  const { foodSearch: search = "" } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
 
   // Derived state
   const filteredFoods = foods.filter(
     (food) =>
-      food.name.toLowerCase().includes(search.toLowerCase()) ||
+      food.name.toLowerCase().includes(search?.toLowerCase()) ||
       food.description.toLowerCase().includes(search.toLowerCase()) ||
       food.tags.some((tag) => tag.toLowerCase().includes(search.toLowerCase()))
   );
@@ -41,7 +57,14 @@ function Menu() {
       <input
         type="search"
         placeholder="Search"
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          navigate({
+            search: (prev) => ({
+              ...prev,
+              foodSearch: e.target.value === "" ? undefined : e.target.value,
+            }),
+          });
+        }}
       />
 
       {<p>{filteredFoods.length} foods found</p>}
@@ -72,5 +95,3 @@ function Menu() {
     </>
   );
 }
-
-export default Menu;

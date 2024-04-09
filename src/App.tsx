@@ -1,24 +1,27 @@
 import { useEffect, useState } from "react";
-import { Food } from "./types";
+import { Food, foodSchema } from "./types";
 import { Spinner } from "./Spinner";
+import ky from "ky";
+import { z } from "zod";
 
 function App() {
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3001/foods")
-      .then((resp) => {
-        resp.json().then((data) => {
-          setLoading(false);
-          console.log(data);
-          setFoods(data);
-        });
-      })
-      .catch((err) => {
+    async function fetchFoods() {
+      try {
+        const data = await ky("http://localhost:3001/foods").json();
+        console.log(data);
+        setFoods(z.array(foodSchema).parse(data));
+      } catch (err) {
         setError(err);
-      });
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchFoods();
   }, []);
 
   if (error) throw error;

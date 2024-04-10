@@ -27,15 +27,17 @@ function Menu() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
-  const { fullTextSearch: search = "", tag = "" } = Route.useSearch();
+  const { fullTextSearch = "", tag = "" } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
   // Derived state
   let filteredFoods = foods.filter(
     (food) =>
-      food.name.toLowerCase().includes(search?.toLowerCase()) ||
-      food.description.toLowerCase().includes(search.toLowerCase()) ||
-      food.tags.some((tag) => tag.toLowerCase().includes(search.toLowerCase()))
+      food.name.toLowerCase().includes(fullTextSearch?.toLowerCase()) ||
+      food.description.toLowerCase().includes(fullTextSearch.toLowerCase()) ||
+      food.tags.some((tag) =>
+        tag.toLowerCase().includes(fullTextSearch.toLowerCase())
+      )
   );
 
   filteredFoods = tag
@@ -67,6 +69,7 @@ function Menu() {
     <>
       <h1>Menu</h1>
       <input
+        value={fullTextSearch}
         type="search"
         placeholder="Search"
         onChange={(e) => {

@@ -10,12 +10,10 @@ export function App() {
         <Link to="/" className="[&.active]:font-bold">
           Home
         </Link>{" "}
+        |{" "}
         <Link to="/menu" className="[&.active]:font-bold">
           Menu
         </Link>{" "}
-        <Link to="/about" className="[&.active]:font-bold">
-          About
-        </Link>
       </div>
       <Routes>
         <Route path="/" element={<Home />} />

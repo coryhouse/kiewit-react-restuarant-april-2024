@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
-import { Food, Tag, foodSchema } from "./types";
+import { Tag, foodSchema } from "./types";
 import { Spinner } from "./Spinner";
 import ky from "ky";
 import { z } from "zod";
 import { useMenuSearchParams } from "./useMenuSearchParams";
+import { useQuery } from "@tanstack/react-query";
 
 export function Menu() {
-  const [foods, setFoods] = useState<Food[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<unknown>(null);
+  const { data: foods = [], isLoading } = useQuery({
+    queryKey: ["foods"],
+    queryFn: async () => {
+      const data = await ky("http://localhost:3001/foods").json();
+      return z.array(foodSchema).parse(data);
+    },
+  });
 
   const { fullTextSearch, tag, setTag, setFullTextSearch } =
     useMenuSearchParams();
@@ -31,23 +35,6 @@ export function Menu() {
     new Set(foods.flatMap((food) => food.tags).sort())
   );
 
-  useEffect(() => {
-    async function fetchFoods() {
-      try {
-        const data = await ky("http://localhost:3001/foods").json();
-        console.log(data);
-        setFoods(z.array(foodSchema).parse(data));
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchFoods();
-  }, []);
-
-  if (error) throw error;
-
   return (
     <>
       <h1>Menu</h1>
@@ -58,9 +45,9 @@ export function Menu() {
         onChange={(e) => setFullTextSearch(e.target.value)}
       />
 
-      {/* <label htmlFor="tag">Filter by tag</label> */}
+      <label htmlFor="tag">Filter by tag</label>
       <select
-        // id="tag"
+        id="tag"
         value={tag}
         onChange={(e) => setTag(e.target.value as Tag)}
       >
@@ -73,7 +60,7 @@ export function Menu() {
       </select>
 
       {<p>{filteredFoods.length} foods found</p>}
-      {loading ? (
+      {isLoading ? (
         <Spinner />
       ) : (
         <table>

@@ -1,18 +1,10 @@
-import { Tag, foodSchema } from "./types";
+import { Tag } from "./types";
 import { Spinner } from "./Spinner";
-import ky from "ky";
-import { z } from "zod";
 import { useMenuSearchParams } from "./useMenuSearchParams";
-import { useQuery } from "@tanstack/react-query";
+import { useFoods } from "./hooks/queries/useFoods";
 
 export function Menu() {
-  const { data: foods = [], isLoading } = useQuery({
-    queryKey: ["foods"],
-    queryFn: async () => {
-      const data = await ky("http://localhost:3001/foods").json();
-      return z.array(foodSchema).parse(data);
-    },
-  });
+  const { data: foods = [], isLoading, isRefetching } = useFoods();
 
   const { fullTextSearch, tag, setTag, setFullTextSearch } =
     useMenuSearchParams();
@@ -58,6 +50,7 @@ export function Menu() {
           </option>
         ))}
       </select>
+      {isRefetching && <p>Refetching...</p>}
 
       {<p>{filteredFoods.length} foods found</p>}
       {isLoading ? (

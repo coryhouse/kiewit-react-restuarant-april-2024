@@ -61,13 +61,9 @@ export function Menu() {
             if (e.target.value === "") {
               prev.delete("fullTextSearch");
               return prev;
-            } else {
-              return {
-                ...prev,
-                fullTextSearch:
-                  e.target.value === "" ? undefined : e.target.value,
-              };
             }
+            prev.set("fullTextSearch", e.target.value);
+            return prev;
           });
         }}
       />
@@ -80,10 +76,8 @@ export function Menu() {
               prev.delete("tag");
               return prev;
             } else {
-              return {
-                ...prev,
-                tag: e.target.value === "" ? undefined : e.target.value,
-              };
+              prev.set("tag", e.target.value);
+              return prev;
             }
           });
         }}

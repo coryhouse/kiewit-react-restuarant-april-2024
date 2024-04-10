@@ -6,14 +6,18 @@ import ky from "ky";
 import { z } from "zod";
 
 type MenuSearch = {
-  foodSearch?: string;
+  fullTextSearch?: string;
+  tag?: string;
 };
+
+type MenuSearchKeys = keyof MenuSearch;
 
 export const Route = createFileRoute("/menu")({
   component: Menu,
-  validateSearch: (search: Record<string, unknown>): MenuSearch => {
+  validateSearch: (search: Record<MenuSearchKeys, unknown>): MenuSearch => {
     return {
-      foodSearch: z.string().optional().parse(search.foodSearch),
+      fullTextSearch: z.string().optional().parse(search.fullTextSearch),
+      tag: z.string().optional().parse(search.tag),
     };
   },
 });
@@ -23,15 +27,23 @@ function Menu() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
 
-  const { foodSearch: search = "" } = Route.useSearch();
+  const { fullTextSearch: search = "", tag = "" } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
   // Derived state
-  const filteredFoods = foods.filter(
+  let filteredFoods = foods.filter(
     (food) =>
       food.name.toLowerCase().includes(search?.toLowerCase()) ||
       food.description.toLowerCase().includes(search.toLowerCase()) ||
       food.tags.some((tag) => tag.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  filteredFoods = tag
+    ? filteredFoods.filter((food) => food.tags.includes(tag))
+    : filteredFoods;
+
+  const uniqueTags = Array.from(
+    new Set(foods.flatMap((food) => food.tags).sort())
   );
 
   useEffect(() => {
@@ -61,11 +73,31 @@ function Menu() {
           navigate({
             search: (prev) => ({
               ...prev,
-              foodSearch: e.target.value === "" ? undefined : e.target.value,
+              fullTextSearch:
+                e.target.value === "" ? undefined : e.target.value,
             }),
           });
         }}
       />
+
+      <select
+        value={tag}
+        onChange={(e) => {
+          navigate({
+            search: (prev) => ({
+              ...prev,
+              tag: e.target.value === "" ? undefined : e.target.value,
+            }),
+          });
+        }}
+      >
+        <option value="">All tags</option>
+        {uniqueTags.map((tag) => (
+          <option key={tag} value={tag}>
+            {tag}
+          </option>
+        ))}
+      </select>
 
       {<p>{filteredFoods.length} foods found</p>}
       {loading ? (

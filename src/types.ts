@@ -12,3 +12,17 @@ export const foodSchema = z
   .strict();
 
 export type Food = z.infer<typeof foodSchema>;
+
+export const tagSchema = z.enum([
+  "Alcoholic",
+  "Appetizer",
+  "Breakfast",
+  "Dinner",
+  "Dessert",
+  "Drink",
+  "Lunch",
+  "Spicy",
+  "Vegetarian",
+]);
+
+export type Tag = z.infer<typeof tagSchema>;

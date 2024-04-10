@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
-import { Food, foodSchema } from "./types";
+import { Food, Tag, foodSchema } from "./types";
 import { Spinner } from "./Spinner";
 import ky from "ky";
 import { z } from "zod";
-import { useSearchParams } from "react-router-dom";
+import { useMenuSearchParams } from "./useMenuSearchParams";
 
 export function Menu() {
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  const fullTextSearch = searchParams.get("fullTextSearch") ?? "";
-  const tag = searchParams.get("tag") ?? "";
+  const { fullTextSearch, tag, setTag, setFullTextSearch } =
+    useMenuSearchParams();
 
   // Derived state
   let filteredFoods = foods.filter(
@@ -56,32 +55,10 @@ export function Menu() {
         value={fullTextSearch}
         type="search"
         placeholder="Search"
-        onChange={(e) => {
-          setSearchParams((prev) => {
-            if (e.target.value === "") {
-              prev.delete("fullTextSearch");
-              return prev;
-            }
-            prev.set("fullTextSearch", e.target.value);
-            return prev;
-          });
-        }}
+        onChange={(e) => setFullTextSearch(e.target.value)}
       />
 
-      <select
-        value={tag}
-        onChange={(e) => {
-          setSearchParams((prev) => {
-            if (e.target.value === "") {
-              prev.delete("tag");
-              return prev;
-            } else {
-              prev.set("tag", e.target.value);
-              return prev;
-            }
-          });
-        }}
-      >
+      <select value={tag} onChange={(e) => setTag(e.target.value as Tag)}>
         <option value="">All tags</option>
         {uniqueTags.map((tag) => (
           <option key={tag} value={tag}>

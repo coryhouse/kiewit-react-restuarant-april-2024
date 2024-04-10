@@ -1,27 +1,25 @@
-import React, { StrictMode } from "react";
-import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { Link, Route, Routes } from "react-router-dom";
+import { Home } from "./home";
+import { Menu } from "./menu";
 
-// Import the generated route tree
-import { routeTree } from "./routeTree.gen";
-
-// Create a new router instance
-const router = createRouter({ routeTree });
-
-// Register the router instance for type safety
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
-}
-
-// Render the app
-const rootElement = document.getElementById("app")!;
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <StrictMode>
-      <RouterProvider router={router} />
-    </StrictMode>
+export function App() {
+  return (
+    <>
+      <div className="p-2 flex gap-2">
+        <Link to="/" className="[&.active]:font-bold">
+          Home
+        </Link>{" "}
+        <Link to="/menu" className="[&.active]:font-bold">
+          Menu
+        </Link>{" "}
+        <Link to="/about" className="[&.active]:font-bold">
+          About
+        </Link>
+      </div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/menu" element={<Menu />} />
+      </Routes>
+    </>
   );
 }

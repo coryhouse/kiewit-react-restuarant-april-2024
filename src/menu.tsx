@@ -1,34 +1,18 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Food, foodSchema } from "../types";
-import { Spinner } from "../Spinner";
+import { Food, foodSchema } from "./types";
+import { Spinner } from "./Spinner";
 import ky from "ky";
 import { z } from "zod";
+import { useSearchParams } from "react-router-dom";
 
-type MenuSearch = {
-  fullTextSearch?: string;
-  tag?: string;
-};
-
-type MenuSearchKeys = keyof MenuSearch;
-
-export const Route = createFileRoute("/menu")({
-  component: Menu,
-  validateSearch: (search: Record<MenuSearchKeys, unknown>): MenuSearch => {
-    return {
-      fullTextSearch: z.string().optional().parse(search.fullTextSearch),
-      tag: z.string().optional().parse(search.tag),
-    };
-  },
-});
-
-function Menu() {
+export function Menu() {
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const { fullTextSearch = "", tag = "" } = Route.useSearch();
-  const navigate = useNavigate({ from: Route.fullPath });
+  const fullTextSearch = searchParams.get("fullTextSearch") ?? "";
+  const tag = searchParams.get("tag") ?? "";
 
   // Derived state
   let filteredFoods = foods.filter(
@@ -73,12 +57,17 @@ function Menu() {
         type="search"
         placeholder="Search"
         onChange={(e) => {
-          navigate({
-            search: (prev) => ({
-              ...prev,
-              fullTextSearch:
-                e.target.value === "" ? undefined : e.target.value,
-            }),
+          setSearchParams((prev) => {
+            if (e.target.value === "") {
+              prev.delete("fullTextSearch");
+              return prev;
+            } else {
+              return {
+                ...prev,
+                fullTextSearch:
+                  e.target.value === "" ? undefined : e.target.value,
+              };
+            }
           });
         }}
       />
@@ -86,11 +75,16 @@ function Menu() {
       <select
         value={tag}
         onChange={(e) => {
-          navigate({
-            search: (prev) => ({
-              ...prev,
-              tag: e.target.value === "" ? undefined : e.target.value,
-            }),
+          setSearchParams((prev) => {
+            if (e.target.value === "") {
+              prev.delete("tag");
+              return prev;
+            } else {
+              return {
+                ...prev,
+                tag: e.target.value === "" ? undefined : e.target.value,
+              };
+            }
           });
         }}
       >

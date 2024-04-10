@@ -58,7 +58,12 @@ export function Menu() {
         onChange={(e) => setFullTextSearch(e.target.value)}
       />
 
-      <select value={tag} onChange={(e) => setTag(e.target.value as Tag)}>
+      {/* <label htmlFor="tag">Filter by tag</label> */}
+      <select
+        // id="tag"
+        value={tag}
+        onChange={(e) => setTag(e.target.value as Tag)}
+      >
         <option value="">All tags</option>
         {uniqueTags.map((tag) => (
           <option key={tag} value={tag}>

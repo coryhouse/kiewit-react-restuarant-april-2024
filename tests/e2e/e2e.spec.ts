@@ -43,3 +43,15 @@ test("generated test", async ({ page }) => {
   await page.getByLabel("Filter by tag").selectOption("Alcoholic");
   await expect(page.getByText("foods found")).toBeVisible();
 });
+
+test("should support deleting a food", async ({ page }) => {
+  await page.goto("http://localhost:3000/admin");
+
+  const deleteBurgerButton = page.getByRole("button", {
+    name: "Delete Burger",
+  });
+
+  await deleteBurgerButton.click();
+  await expect(page.getByText("Burger")).not.toBeVisible();
+  await expect(deleteBurgerButton).not.toBeVisible();
+});

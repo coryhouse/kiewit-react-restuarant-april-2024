@@ -15,6 +15,10 @@ export function AddFoodForm() {
 
   const addFood = useAddFood(() => setFood(newFood));
 
+  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFood({ ...food, [e.target.name]: e.target.value });
+  }
+
   return (
     <form
       onSubmit={(e) => {
@@ -24,12 +28,7 @@ export function AddFoodForm() {
     >
       <label>
         Name
-        <input
-          type="text"
-          name="name"
-          value={food.name}
-          onChange={(e) => setFood({ ...food, name: e.target.value })}
-        />
+        <input type="text" id="name" value={food.name} onChange={onChange} />
       </label>
       <label>
         Description
@@ -37,7 +36,7 @@ export function AddFoodForm() {
           type="text"
           name="description"
           value={food.description}
-          onChange={(e) => setFood({ ...food, description: e.target.value })}
+          onChange={onChange}
         />
       </label>
       <button type="submit">Add Food</button>

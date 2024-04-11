@@ -44,14 +44,20 @@ test("generated test", async ({ page }) => {
   await expect(page.getByText("foods found")).toBeVisible();
 });
 
-test("should support deleting a food", async ({ page }) => {
+test("should support adding and deleting a food", async ({ page }) => {
   await page.goto("http://localhost:3000/admin");
 
+  // Add a new food
+  await page.getByLabel("Name").fill("test food");
+  await page.getByLabel("Description").click();
+  await page.getByLabel("Description").fill("test description");
+  await page.getByRole("button", { name: "Add Food" }).click();
+
   const deleteBurgerButton = page.getByRole("button", {
-    name: "Delete Burger",
+    name: "Delete test food",
   });
 
   await deleteBurgerButton.click();
-  await expect(page.getByText("Burger")).not.toBeVisible();
+  await expect(page.getByText("test food")).not.toBeVisible();
   await expect(deleteBurgerButton).not.toBeVisible();
 });

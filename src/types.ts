@@ -13,6 +13,8 @@ export const foodSchema = z
 
 export type Food = z.infer<typeof foodSchema>;
 
+export type NewFood = Omit<Food, "id">;
+
 export const tagSchema = z.enum([
   "Alcoholic",
   "Appetizer",

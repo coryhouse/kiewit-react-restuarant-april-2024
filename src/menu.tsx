@@ -2,6 +2,7 @@ import { Tag } from "./types";
 import { Spinner } from "./Spinner";
 import { useMenuSearchParams } from "./useMenuSearchParams";
 import { useFoods } from "./hooks/queries/useFoods";
+import { useMemo, useState } from "react";
 
 export function Menu() {
   const { data: foods = [], isLoading, isRefetching } = useFoods();
@@ -10,18 +11,23 @@ export function Menu() {
     useMenuSearchParams();
 
   // Derived state
-  let filteredFoods = foods.filter(
-    (food) =>
-      food.name.toLowerCase().includes(fullTextSearch?.toLowerCase()) ||
-      food.description.toLowerCase().includes(fullTextSearch.toLowerCase()) ||
-      food.tags.some((tag) =>
-        tag.toLowerCase().includes(fullTextSearch.toLowerCase())
-      )
-  );
+  const filteredFoods = useMemo(() => {
+    let filteredFoods = foods.filter(
+      (food) =>
+        food.name.toLowerCase().includes(fullTextSearch?.toLowerCase()) ||
+        food.description.toLowerCase().includes(fullTextSearch.toLowerCase()) ||
+        food.tags.some((tag) =>
+          tag.toLowerCase().includes(fullTextSearch.toLowerCase())
+        )
+    );
 
-  filteredFoods = tag
-    ? filteredFoods.filter((food) => food.tags.includes(tag))
-    : filteredFoods;
+    filteredFoods = tag
+      ? filteredFoods.filter((food) => food.tags.includes(tag))
+      : filteredFoods;
+
+    console.log("filtering");
+    return filteredFoods;
+  }, [foods, fullTextSearch, tag]);
 
   const uniqueTags = Array.from(
     new Set(foods.flatMap((food) => food.tags).sort())
@@ -30,6 +36,7 @@ export function Menu() {
   return (
     <>
       <h1>Menu</h1>
+
       <input
         value={fullTextSearch}
         type="search"

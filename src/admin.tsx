@@ -1,7 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "./Spinner";
-import { useFoods } from "./hooks/queries/useFoods";
-import ky from "ky";
+import { useAddFood, useDeleteFood, useFoods } from "./hooks/queries/useFoods";
 import { useState } from "react";
 import { NewFood } from "./types";
 
@@ -17,28 +15,8 @@ export function Admin() {
   const { data: foods = [], isLoading } = useFoods();
   const [food, setFood] = useState(newFood);
 
-  const queryClient = useQueryClient();
-
-  const deleteFood = useMutation({
-    mutationFn: async (id: number) => {
-      return ky.delete(`http://localhost:3001/foods/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["foods"] });
-    },
-  });
-
-  const addFood = useMutation({
-    mutationFn: async () => {
-      const savedFood = await ky
-        .post(`http://localhost:3001/foods`, { json: food })
-        .json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["foods"] });
-      setFood(newFood);
-    },
-  });
+  const deleteFood = useDeleteFood();
+  const addFood = useAddFood(() => setFood(newFood));
 
   return (
     <>
@@ -47,7 +25,7 @@ export function Admin() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          addFood.mutate();
+          addFood.mutate(food);
         }}
       >
         <label>

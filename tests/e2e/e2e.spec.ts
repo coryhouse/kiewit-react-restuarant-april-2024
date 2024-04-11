@@ -53,6 +53,10 @@ test("should support adding and deleting a food", async ({ page }) => {
   await page.getByLabel("Description").fill("test description");
   await page.getByRole("button", { name: "Add Food" }).click();
 
+  // now the form should be empty
+  await expect(page.getByLabel("Name")).toHaveValue("");
+  await expect(page.getByLabel("Description")).toHaveValue("");
+
   const deleteBurgerButton = page.getByRole("button", {
     name: "Delete test food",
   });
